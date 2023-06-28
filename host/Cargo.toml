@@ -1,0 +1,15 @@
+[package]
+name = "host"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+tracing = "0.1.26"
+tracing-subscriber = { version = "0.3.1", features = ["fmt", "env-filter"] }
+tokio = { version = "1", features = ["full"] }
+clap = { version = "4", features = ["derive"] }
+wasmtime = { path = "/home/phickey/src/wasmtime/crates/wasmtime", features = ["component-model"] }
+wasmtime-wasi = { path = "/home/phickey/src/wasmtime/crates/wasi" }
