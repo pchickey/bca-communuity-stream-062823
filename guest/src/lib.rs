@@ -28,7 +28,7 @@ impl TestReactor for T {
             let output = format!("{s}\n");
             wasi::io::streams::write(o, output.as_bytes()).map_err(|_| ())?;
 
-            //std::thread::sleep(std::time::Duration::from_secs(1));
+            std::thread::sleep(std::time::Duration::from_secs(1));
         }
         Ok(())
     }

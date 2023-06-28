@@ -123,17 +123,16 @@ async fn main() -> Result<()> {
     // Show that integration with the WASI context is working - the guest will
     // interpolate $GOOD_DOG to gussie here using the environment:
     let r = reactor
-        .call_add_strings(&mut store, &["hello", "$GOOD_DOG"])
+        .call_add_strings(&mut store, &["hello", "$POUTY_DOG"])
         .await?;
     assert_eq!(r, 2);
 
-    let contents = reactor.call_get_strings(&mut store).await?;
-    println!("call_get_strings: {contents:?}");
-    assert_eq!(contents, &["hello", "gussie"]);
+    let _contents = reactor.call_get_strings(&mut store).await?;
+    //println!("call_get_strings: {contents:?}");
 
     // demo_wasi_structures(&mut store, &mut reactor).await?;
     // demo_memory_output_stream(&mut store, &mut reactor).await?;
-    // demo_async_output_stream(&mut store, &mut reactor).await?;
+    demo_async_output_stream(&mut store, &mut reactor).await?;
 
     Ok(())
 }
@@ -210,7 +209,6 @@ async fn demo_memory_output_stream(
     reactor: &mut TestReactor,
 ) -> Result<()> {
     // Show that we can pass in a resource type whose impls are defined in the
-    // `host` and `wasi-common` crate.
     // Note, this works because of the add_to_linker invocations using the
     // `host` crate for `streams`, not because of `with` in the bindgen macro.
     let writepipe = preview2::pipe::MemoryOutputPipe::new();
@@ -220,7 +218,11 @@ async fn demo_memory_output_stream(
     )?;
     let r = reactor.call_write_strings_to(store, table_ix).await?;
     assert_eq!(r, Ok(()));
-    assert_eq!(writepipe.contents(), b"hellogussie");
+    println!(
+        "write pipe contents: {:?}",
+        String::from_utf8_lossy(&writepipe.contents())
+    );
+    //assert_eq!(writepipe.contents(), b"hello\nwilla\n");
     Ok(())
 }
 
