@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_mut)]
 
 use anyhow::Result;
 use clap::Parser;
@@ -131,8 +131,59 @@ async fn main() -> Result<()> {
     println!("call_get_strings: {contents:?}");
     assert_eq!(contents, &["hello", "gussie"]);
 
-    demo_async_output_stream(&mut store, &mut reactor).await?;
+    // demo_wasi_structures(&mut store, &mut reactor).await?;
+    // demo_memory_output_stream(&mut store, &mut reactor).await?;
+    // demo_async_output_stream(&mut store, &mut reactor).await?;
 
+    Ok(())
+}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+async fn demo_wasi_structures(
+    store: &mut Store<ReactorCtx>,
+    reactor: &mut TestReactor,
+) -> Result<()> {
+    // Show that the `with` invocation in the macro means we get to re-use the
+    // type definitions from inside the `host` crate for these structures:
+    let ds = filesystem::DescriptorStat {
+        data_access_timestamp: wall_clock::Datetime {
+            nanoseconds: 123,
+            seconds: 45,
+        },
+        data_modification_timestamp: wall_clock::Datetime {
+            nanoseconds: 789,
+            seconds: 10,
+        },
+        device: 0,
+        inode: 0,
+        link_count: 0,
+        size: 0,
+        status_change_timestamp: wall_clock::Datetime {
+            nanoseconds: 0,
+            seconds: 1,
+        },
+        type_: filesystem::DescriptorType::Unknown,
+    };
+    let expected = format!("{ds:?}");
+    let got = reactor.call_pass_an_imported_record(store, ds).await?;
+    assert_eq!(expected, got);
     Ok(())
 }
 
@@ -233,54 +284,5 @@ async fn demo_async_output_stream(
     let r = reactor.call_write_strings_to(store, table_ix).await?;
     assert_eq!(r, Ok(()));
 
-    Ok(())
-}
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-async fn demo_wasi_structures(
-    store: &mut Store<ReactorCtx>,
-    reactor: &mut TestReactor,
-) -> Result<()> {
-    // Show that the `with` invocation in the macro means we get to re-use the
-    // type definitions from inside the `host` crate for these structures:
-    let ds = filesystem::DescriptorStat {
-        data_access_timestamp: wall_clock::Datetime {
-            nanoseconds: 123,
-            seconds: 45,
-        },
-        data_modification_timestamp: wall_clock::Datetime {
-            nanoseconds: 789,
-            seconds: 10,
-        },
-        device: 0,
-        inode: 0,
-        link_count: 0,
-        size: 0,
-        status_change_timestamp: wall_clock::Datetime {
-            nanoseconds: 0,
-            seconds: 1,
-        },
-        type_: filesystem::DescriptorType::Unknown,
-    };
-    let expected = format!("{ds:?}");
-    let got = reactor.call_pass_an_imported_record(store, ds).await?;
-    assert_eq!(expected, got);
     Ok(())
 }

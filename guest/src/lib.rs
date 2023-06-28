@@ -24,15 +24,13 @@ impl TestReactor for T {
     }
 
     fn write_strings_to(o: OutputStream) -> Result<(), ()> {
-        unsafe {
-            for s in STATE.iter() {
-                let output = format!("{s}\n");
-                wasi::io::streams::write(o, output.as_bytes()).map_err(|_| ())?;
+        for s in Self::get_strings() {
+            let output = format!("{s}\n");
+            wasi::io::streams::write(o, output.as_bytes()).map_err(|_| ())?;
 
-                std::thread::sleep(std::time::Duration::from_secs(1));
-            }
-            Ok(())
+            //std::thread::sleep(std::time::Duration::from_secs(1));
         }
+        Ok(())
     }
     fn pass_an_imported_record(stat: wasi::filesystem::filesystem::DescriptorStat) -> String {
         format!("{stat:?}")
